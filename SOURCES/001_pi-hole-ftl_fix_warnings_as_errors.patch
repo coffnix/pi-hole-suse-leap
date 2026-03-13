@@ -1,0 +1,13 @@
+diff -uNr pi-hole-ftl-6.x+git.20230826T131614~0705c01.orig/src/CMakeLists.txt pi-hole-ftl-6.x+git.20230826T131614~0705c01/src/CMakeLists.txt
+--- pi-hole-ftl-6.x+git.20230826T131614~0705c01.orig/src/CMakeLists.txt	2023-09-01 10:23:07.924121000 +0200
++++ pi-hole-ftl-6.x+git.20230826T131614~0705c01/src/CMakeLists.txt	2023-09-01 10:25:40.867066000 +0200
+@@ -56,8 +56,7 @@
+ set(WARN_FLAGS "-Wall -Wextra -Wno-unused-parameter")
+ 
+ # Extra warning flags we apply only to the FTL part of the code (used not for foreign code such as dnsmasq and SQLite3)
+-set(EXTRAWARN_GCC6 "-Werror \
+-                    -Waddress \
++set(EXTRAWARN_GCC6 "-Waddress \
+                     -Wlogical-op \
+                     -Wmissing-field-initializers \
+                     -Woverlength-strings \

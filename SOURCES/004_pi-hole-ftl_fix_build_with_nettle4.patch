@@ -1,0 +1,11 @@
+--- a/src/api/2fa.c
++++ b/src/api/2fa.c
+@@ -33,7 +33,7 @@
+ 	// Compute HMAC-SHA1
+ 	hmac_sha1_update(&ctx, sizeof(counter_be), (uint8_t*)&counter_be);
+ 	uint8_t out[SHA1_DIGEST_SIZE];
+-	hmac_sha1_digest(&ctx, SHA1_DIGEST_SIZE, out);
++	hmac_sha1_digest(&ctx, out);
+
+ 	// Truncate HMAC-SHA1 for ease of use
+ 	// RFC 6238 (section 5.3): offset = last nibble of hash

@@ -1,0 +1,5 @@
+# pihole-ftl claimns insists on that it needs these caps.
+# The settings below were applied alredy during installation
+# If you need to setup manually please run chkstat --system to apply the caps.
+/usr/bin/pihole-FTL root:root 0755
++capabilities cap_net_bind_service,cap_net_raw,cap_net_admin,cap_sys_nice,cap_ipc_lock,cap_chown+eip

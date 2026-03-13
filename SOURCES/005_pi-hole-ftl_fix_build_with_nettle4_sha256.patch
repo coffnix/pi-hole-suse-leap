@@ -1,0 +1,31 @@
+--- a/src/config/password.c
++++ b/src/config/password.c
+@@ -76,7 +76,7 @@
+ 	              strlen(password),
+ 	              (uint8_t*)password);
+
+-	sha256_digest(&ctx, SHA256_DIGEST_SIZE, raw_response);
++	sha256_digest(&ctx, raw_response);
+ 	sha256_raw_to_hex(raw_response, response);
+
+ 	// Hash password a second time
+@@ -85,7 +85,7 @@
+ 	              strlen(response),
+ 	              (uint8_t*)response);
+
+-	sha256_digest(&ctx, SHA256_DIGEST_SIZE, raw_response);
++	sha256_digest(&ctx, raw_response);
+ 	sha256_raw_to_hex(raw_response, response);
+
+ 	return strdup(response);
+--- a/src/files.c
++++ b/src/files.c
+@@ -755,7 +755,7 @@
+ 	}
+
+ 	// Finalize SHA256 context
+-	sha256_digest(&ctx, SHA256_DIGEST_SIZE, checksum);
++	sha256_digest(&ctx, checksum);
+
+ 	// Close file
+ 	fclose(fp);

@@ -1,0 +1,93 @@
+diff -uNr FTL.orig/src/webserver/x509.c FTL/src/webserver/x509.c
+--- FTL.orig/src/webserver/x509.c	2026-02-06 12:43:01.268181244 +0100
++++ FTL/src/webserver/x509.c	2026-02-06 12:49:23.779506246 +0100
+@@ -22,6 +22,8 @@
+ # endif
+ # include <mbedtls/x509_crt.h>
+ # include <mbedtls/pk.h>
++# include <mbedtls/entropy.h>
++# include <mbedtls/ctr_drbg.h>
+ 
+ // We enforce at least mbedTLS v3.5.0 if we use it
+ #if MBEDTLS_VERSION_NUMBER < 0x03050000
+@@ -75,6 +77,52 @@
+ 	return 0;
+ }
+ 
++// mbedTLS API compatibility helpers for versions that require an RNG
++static mbedtls_ctr_drbg_context *get_ctr_drbg_ctx(void)
++{
++	static mbedtls_entropy_context entropy;
++	static mbedtls_ctr_drbg_context ctr;
++	static int initialized = 0;
++
++	if(!initialized)
++	{
++		const char *pers = "pihole_ftl";
++		mbedtls_entropy_init(&entropy);
++		mbedtls_ctr_drbg_init(&ctr);
++		if(mbedtls_ctr_drbg_seed(&ctr, mbedtls_entropy_func, &entropy,
++								 (const unsigned char *)pers, strlen(pers)) != 0)
++		{
++			return NULL;
++		}
++		initialized = 1;
++	}
++	return &ctr;
++}
++
++static int my_mbedtls_x509write_crt_pem(mbedtls_x509write_cert *ctx, unsigned char *buf, size_t size)
++{
++#if MBEDTLS_VERSION_NUMBER >= 0x03060000
++	mbedtls_ctr_drbg_context *ctr = get_ctr_drbg_ctx();
++	if(ctr == NULL)
++		return -1;
++	return mbedtls_x509write_crt_pem(ctx, buf, size, mbedtls_ctr_drbg_random, ctr);
++#else
++	return mbedtls_x509write_crt_pem(ctx, buf, size);
++#endif
++}
++
++static int my_mbedtls_pk_parse_keyfile(mbedtls_pk_context *ctx, const char *path, const char *pwd)
++{
++#if MBEDTLS_VERSION_NUMBER >= 0x03060000
++	mbedtls_ctr_drbg_context *ctr = get_ctr_drbg_ctx();
++	if(ctr == NULL)
++		return -1;
++	return mbedtls_pk_parse_keyfile(ctx, path, pwd, mbedtls_ctr_drbg_random, ctr);
++#else
++	return mbedtls_pk_parse_keyfile(ctx, path, pwd);
++#endif
++}
++
+ // Write a key and/or certificate to a file
+ static bool write_to_file(const char *filename, const char *type, const char *suffix, const char *cert, const char *key, const char *cacert)
+ {
+@@ -229,7 +277,7 @@
+ 	mbedtls_x509write_crt_set_basic_constraints(&ca_cert, 1, -1);
+ 
+ 	// Export CA in PEM format
+-	if((ret = mbedtls_x509write_crt_pem(&ca_cert, ca_buffer, sizeof(ca_buffer))) != 0)
++	if((ret = my_mbedtls_x509write_crt_pem(&ca_cert, ca_buffer, sizeof(ca_buffer))) != 0)
+ 	{
+ 		printf("ERROR: mbedtls_x509write_crt_pem (CA) returned %d\n", ret);
+ 		return false;
+@@ -291,7 +339,7 @@
+ 		printf("mbedtls_x509write_crt_set_subject_alternative_name returned %d\n", ret);
+ 
+ 	// Export certificate in PEM format
+-	if((ret = mbedtls_x509write_crt_pem(&server_cert, cert_buffer, sizeof(cert_buffer))) != 0)
++	if((ret = my_mbedtls_x509write_crt_pem(&server_cert, cert_buffer, sizeof(cert_buffer))) != 0)
+ 	{
+ 		printf("ERROR: mbedtls_x509write_crt_pem returned %d\n", ret);
+ 		return false;
+@@ -442,7 +490,7 @@
+ 	mbedtls_pk_context key;
+ 	mbedtls_pk_init(&key);
+ 	bool has_key = true;
+-	int rc = mbedtls_pk_parse_keyfile(&key, certfile, NULL);
++	int rc = my_mbedtls_pk_parse_keyfile(&key, certfile, NULL);
+ 	if (rc != 0)
+ 	{
+ 		log_info("No key found");
+

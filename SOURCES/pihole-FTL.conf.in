@@ -1,0 +1,84 @@
+; /etc/pihole/pihole-FTL.conf will be read by pihole-FTL(8) on startup.
+
+; Log file location. Default /var/log/pihole-FTL.log.
+LOGFILE=/var/log/pihole/pihole-FTL.log
+
+; Default /var/run/pihole-FTL.pid.
+PIDFILE=/run/pihole-FTL.pid
+
+; Default /var/run/pihole-FTL.sock.
+SOCKETFILE=/run/pihole-FTL.sock
+
+; Default /etc/pihole/whitelist.txt.
+WHITELISTFILE=/etc/pihole/whitelist.txt
+
+; Default /etc/pihole/black.list.
+BLACKLISTFILE=/etc/pihole/black.list
+
+; Default /etc/pihole/gravity.list.
+GRAVITYFILE=/etc/pihole/gravity.list
+
+; Default /etc/pihole/regex.list.
+REGEXLISTFILE=/etc/pihole/regex.list
+
+; Default /etc/pihole/setupVars.conf.
+SETUPVARSFILE=/etc/pihole/setupVars.conf
+
+; Default /etc/pihole/auditlog.list.
+AUDITLISTFILE=/etc/pihole/auditlog.list
+
+; Default /etc/pihole/macvendor.db.
+MACVENDORDB=/etc/pihole/macvendor.db
+
+; Listen only for local socket connections or permit all connections. Default localonly.
+SOCKET_LISTENING=all
+
+; Display all queries? Set to no to hide query display. Default yes.
+QUERY_DISPLAY=yes
+
+; Allow FTL to analyze AAAA queries from pihole.log? Default yes.
+AAAA_QUERY_ANALYSIS=yes
+
+; Should FTL try to resolve IPv6 addresses to host names? Default yes.
+RESOLVE_IPV6=yes
+
+; Should FTL try to resolve IPv4 addresses to host names? Default yes.
+RESOLVE_IPV4=yes
+
+; How long should queries be stored in the database?
+; Setting this to 0 disables the database. Default 365.
+MAXDBDAYS=365
+
+; How often do we store queries in FTL's database [minutes]? Default 1.0.
+DBINTERVAL=1.0
+
+; Specify path and filename of FTL's SQLite long-term database.
+; Setting this to DBFILE= disables the database altogether. Default /etc/pihole/pihole-FTL.db
+DBFILE=/etc/pihole/pihole-FTL.db
+
+; Up to how many hours of queries should be imported from the database and logs?
+; Maximum is 744 (31 days). Default 24.0.
+MAXLOGAGE=24.0
+
+; On which port should FTL be listening? Default 4711.
+FTLPORT=4711
+
+; Which privacy level is used?
+; 0 - show everything
+; 1 - hide domains
+; 2 - hide domains and clients
+; 3 - anonymous mode (hide everything)
+; 4 - disable all statistics
+; Default 0.
+PRIVACYLEVEL=0
+
+; Should FTL ignore queries coming from the local machine? Default no.
+IGNORE_LOCALHOST=no
+
+; How should FTL reply to blocked queries? Default IP.
+; Possible values:
+; - IP
+; - IP-AAAA-NODATA
+; - NXDOMAIN
+; - NULL
+BLOCKINGMODE=NODATA
