@@ -34,6 +34,7 @@ Source12:       pihole_unbound.conf
 Source13:       99-edns.conf
 Source14:       %{name}.sudo
 Patch10:        010_pi-hole_logrotate_config.patch
+Patch11:        pihole-updatecheck.patch
 
 BuildRequires:  sysuser-tools
 BuildRequires:  sudo

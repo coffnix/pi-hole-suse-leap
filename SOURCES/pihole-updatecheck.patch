@@ -1,0 +1,135 @@
+--- a/advanced/Scripts/updatecheck.sh
++++ b/advanced/Scripts/updatecheck.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/bin/bash
+ # Pi-hole: A black hole for Internet advertisements
+ # (c) 2017 Pi-hole, LLC (https://pi-hole.net)
+ # Network-wide ad blocking via your own hardware.
+@@ -8,6 +8,12 @@
+ # This file is copyright under the latest version of the EUPL.
+ # Please see LICENSE file for your rights under this license.
+ 
++# Detect openSUSE Leap
++IS_OPENSUSE=false
++if grep -qi 'opensuse-leap' /etc/os-release 2>/dev/null; then
++    IS_OPENSUSE=true
++fi
++
+ function get_local_branch() {
+     # Return active branch
+     cd "${1}" 2>/dev/null || return 1
+@@ -25,6 +31,44 @@
+     git rev-parse --short=8 HEAD || return 1
+ }
+ 
++
++function get_rpm_version() {
++    rpm -q --qf '%{VERSION}\n' "${1}" 2>/dev/null || return 1
++}
++
++function get_rpm_branch() {
++    rpm -q "${1}" >/dev/null 2>&1 || return 1
++    echo "master"
++}
++
++function get_rpm_hash() {
++    rpm -q "${1}" >/dev/null 2>&1 || return 1
++    echo ""
++}
++
++function get_local_version_or_rpm() {
++    if ${IS_OPENSUSE}; then
++        get_rpm_version "${2}" || get_local_version "${1}"
++    else
++        get_local_version "${1}"
++    fi
++}
++
++function get_local_branch_or_rpm() {
++    if ${IS_OPENSUSE}; then
++        get_rpm_branch "${2}" || get_local_branch "${1}"
++    else
++        get_local_branch "${1}"
++    fi
++}
++
++function get_local_hash_or_rpm() {
++    if ${IS_OPENSUSE}; then
++        get_rpm_hash "${2}" || get_local_hash "${1}"
++    else
++        get_local_hash "${1}"
++    fi
++}
+ function get_remote_version() {
+     # if ${2} is = "master" we need to use the "latest" endpoint, otherwise, we simply return null
+     if [[ "${2}" == "master" ]]; then
+@@ -40,7 +84,7 @@
+ 
+ # Source the utils file for addOrEditKeyValPair()
+ # shellcheck source="./advanced/Scripts/utils.sh"
+-. /opt/pihole/utils.sh
++. /usr/share/pi-hole/utils.sh
+ 
+ ADMIN_INTERFACE_DIR=$(getFTLConfigValue "webserver.paths.webroot")$(getFTLConfigValue "webserver.paths.webhome")
+ readonly ADMIN_INTERFACE_DIR
+@@ -71,13 +115,13 @@
+ 
+ # get Core versions
+ 
+-CORE_VERSION="$(get_local_version /etc/.pihole)"
++CORE_VERSION="$(get_local_version_or_rpm /usr/share/pi-hole pi-hole)"
+ addOrEditKeyValPair "${VERSION_FILE}" "CORE_VERSION" "${CORE_VERSION}"
+ 
+-CORE_BRANCH="$(get_local_branch /etc/.pihole)"
++CORE_BRANCH="$(get_local_branch_or_rpm /usr/share/pi-hole pi-hole)"
+ addOrEditKeyValPair "${VERSION_FILE}" "CORE_BRANCH" "${CORE_BRANCH}"
+ 
+-CORE_HASH="$(get_local_hash /etc/.pihole)"
++CORE_HASH="$(get_local_hash_or_rpm /usr/share/pi-hole pi-hole)"
+ addOrEditKeyValPair "${VERSION_FILE}" "CORE_HASH" "${CORE_HASH}"
+ 
+ GITHUB_CORE_VERSION="$(get_remote_version pi-hole "${CORE_BRANCH}")"
+@@ -88,13 +132,13 @@
+ 
+ # get Web versions
+ 
+-WEB_VERSION="$(get_local_version "${ADMIN_INTERFACE_DIR}")"
++WEB_VERSION="$(get_local_version_or_rpm "${ADMIN_INTERFACE_DIR}" pi-hole-web)"
+ addOrEditKeyValPair "${VERSION_FILE}" "WEB_VERSION" "${WEB_VERSION}"
+ 
+-WEB_BRANCH="$(get_local_branch "${ADMIN_INTERFACE_DIR}")"
++WEB_BRANCH="$(get_local_branch_or_rpm "${ADMIN_INTERFACE_DIR}" pi-hole-web)"
+ addOrEditKeyValPair "${VERSION_FILE}" "WEB_BRANCH" "${WEB_BRANCH}"
+ 
+-WEB_HASH="$(get_local_hash "${ADMIN_INTERFACE_DIR}")"
++WEB_HASH="$(get_local_hash_or_rpm "${ADMIN_INTERFACE_DIR}" pi-hole-web)"
+ addOrEditKeyValPair "${VERSION_FILE}" "WEB_HASH" "${WEB_HASH}"
+ 
+ GITHUB_WEB_VERSION="$(get_remote_version web "${WEB_BRANCH}")"
+@@ -105,13 +149,20 @@
+ 
+ # get FTL versions
+ 
+-FTL_VERSION="$(pihole-FTL version)"
+-addOrEditKeyValPair "${VERSION_FILE}" "FTL_VERSION" "${FTL_VERSION}"
++# get FTL versions
+ 
+-FTL_BRANCH="$(pihole-FTL branch)"
+-addOrEditKeyValPair "${VERSION_FILE}" "FTL_BRANCH" "${FTL_BRANCH}"
++if ${IS_OPENSUSE}; then
++    FTL_VERSION="$(rpm -q --qf '%{VERSION}' pi-hole-ftl 2>/dev/null)"
++    FTL_BRANCH="master"
++    FTL_HASH=""
++else
++    FTL_VERSION="$(pihole-FTL version)"
++    FTL_BRANCH="$(pihole-FTL branch)"
++    FTL_HASH="$(pihole-FTL --hash)"
++fi
+ 
+-FTL_HASH="$(pihole-FTL --hash)"
++addOrEditKeyValPair "${VERSION_FILE}" "FTL_VERSION" "${FTL_VERSION}"
++addOrEditKeyValPair "${VERSION_FILE}" "FTL_BRANCH" "${FTL_BRANCH}"
+ addOrEditKeyValPair "${VERSION_FILE}" "FTL_HASH" "${FTL_HASH}"
+ 
+ GITHUB_FTL_VERSION="$(get_remote_version FTL "${FTL_BRANCH}")"
