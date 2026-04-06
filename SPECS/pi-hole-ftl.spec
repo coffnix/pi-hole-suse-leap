@@ -18,7 +18,7 @@
 %define _lto_cflags %{nil}
 
 Name:           pi-hole-ftl
-Version:        6.5
+Version:        6.6
 Release:        1.1
 Summary:        Network-wide ad blocking via your own Linux hardware
 License:        EUPL-1.1

@@ -16,7 +16,7 @@
 #
 
 Name:           pi-hole
-Version:        6.4
+Version:        6.4.1
 Release:        1.1
 Summary:        A black hole for Internet advertisements
 License:        EUPL-1.1
@@ -36,7 +36,6 @@ Source14:       %{name}.sudo
 Patch10:        010_pi-hole_logrotate_config.patch
 
 BuildRequires:  sysuser-tools
-BuildRequires:  dnsmasq
 BuildRequires:  sudo
 BuildRequires:  unbound
 BuildRequires:  xz

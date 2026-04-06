@@ -16,7 +16,7 @@
 #
 %define         web_files_location     /var/www/html/
 Name:           pi-hole-web
-Version:        6.4.1
+Version:        6.5
 Release:        1.1
 Summary:        Pi-hole dashboard for stats and more
 License:        EUPL-1.2
