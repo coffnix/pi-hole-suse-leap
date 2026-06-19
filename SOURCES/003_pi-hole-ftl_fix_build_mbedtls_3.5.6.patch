@@ -1,12 +1,17 @@
 diff -uNr FTL.orig/src/webserver/x509.c FTL/src/webserver/x509.c
 --- FTL.orig/src/webserver/x509.c	2026-02-06 12:43:01.268181244 +0100
 +++ FTL/src/webserver/x509.c	2026-02-06 12:49:23.779506246 +0100
-@@ -22,6 +22,8 @@
+@@ -22,6 +22,13 @@
  # endif
  # include <mbedtls/x509_crt.h>
  # include <mbedtls/pk.h>
++#if MBEDTLS_VERSION_NUMBER >= 0x04000000
++# include <mbedtls/private/entropy.h>
++# include <mbedtls/private/ctr_drbg.h>
++#else
 +# include <mbedtls/entropy.h>
 +# include <mbedtls/ctr_drbg.h>
++#endif
  
  // We enforce at least mbedTLS v3.5.0 if we use it
  #if MBEDTLS_VERSION_NUMBER < 0x03050000
@@ -38,7 +43,7 @@ diff -uNr FTL.orig/src/webserver/x509.c FTL/src/webserver/x509.c
 +
 +static int my_mbedtls_x509write_crt_pem(mbedtls_x509write_cert *ctx, unsigned char *buf, size_t size)
 +{
-+#if MBEDTLS_VERSION_NUMBER >= 0x03060000
++#if MBEDTLS_VERSION_NUMBER >= 0x03060000 && MBEDTLS_VERSION_NUMBER < 0x04000000
 +	mbedtls_ctr_drbg_context *ctr = get_ctr_drbg_ctx();
 +	if(ctr == NULL)
 +		return -1;
@@ -50,7 +55,7 @@ diff -uNr FTL.orig/src/webserver/x509.c FTL/src/webserver/x509.c
 +
 +static int my_mbedtls_pk_parse_keyfile(mbedtls_pk_context *ctx, const char *path, const char *pwd)
 +{
-+#if MBEDTLS_VERSION_NUMBER >= 0x03060000
++#if MBEDTLS_VERSION_NUMBER >= 0x03060000 && MBEDTLS_VERSION_NUMBER < 0x04000000
 +	mbedtls_ctr_drbg_context *ctr = get_ctr_drbg_ctx();
 +	if(ctr == NULL)
 +		return -1;
