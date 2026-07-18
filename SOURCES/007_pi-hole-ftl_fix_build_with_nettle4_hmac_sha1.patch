@@ -1,0 +1,9 @@
+--- a/src/api/2fa.c
++++ b/src/api/2fa.c
+@@ -33,7 +33,7 @@ static uint32_t hotp(const uint8_t *key, const size_t key_len, const uint64_t counter)
+ 	hmac_sha1_set_key(&ctx, key_len, key);
+ 	hmac_sha1_update(&ctx, sizeof(counter_bytes), counter_bytes);
+-	hmac_sha1_digest(&ctx, out);
++	hmac_sha1_digest(&ctx, SHA1_DIGEST_SIZE, out);
+ 
+ 	const unsigned int offset = out[SHA1_DIGEST_SIZE - 1] & 0x0F;

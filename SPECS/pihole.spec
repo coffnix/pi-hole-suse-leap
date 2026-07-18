@@ -16,7 +16,7 @@
 #
 
 Name:           pi-hole
-Version:        6.4.1
+Version:        6.4.3
 Release:        1.1
 Summary:        A black hole for Internet advertisements
 License:        EUPL-1.1
@@ -190,7 +190,6 @@ install -Dm0644 %{S:8} %{buildroot}%{_sysconfdir}/pihole/dns-servers.conf
 %defattr(-,root,root,-)
 %doc CONTRIBUTING.md
 %license LICENSE
-%dir %{_sysconfdir}/dnsmasq.d
 %attr(0775, pihole, pihole) %dir %{_sysconfdir}/pihole
 %config(noreplace) %attr(0664, pihole, pihole) %{_sysconfdir}/pihole/adlists.list
 %config(noreplace) %attr(0664, pihole, pihole) %{_sysconfdir}/pihole/dns-servers.conf
@@ -199,7 +198,6 @@ install -Dm0644 %{S:8} %{buildroot}%{_sysconfdir}/pihole/dns-servers.conf
 %config(noreplace) %attr(0640, root, root) %{_sysconfdir}/sudoers.d/pihole
 %{_bindir}/pihole
 %{_mandir}/man8/pihole.8*
-%attr(0775, pihole, pihole) %dir %{_datadir}/%{name}
 %attr(0775, pihole, pihole) %{_datadir}/%{name}/*
 %ghost %attr(0775, pihole, pihole) %dir /run/pihole
 %ghost %attr(0664, pihole, pihole) /etc/pihole/gravity*.db
@@ -215,7 +213,6 @@ install -Dm0644 %{S:8} %{buildroot}%{_sysconfdir}/pihole/dns-servers.conf
 
 %files config-unbound
 %defattr(-,root,root)
-%attr(0775, root, unbound) %dir %{_sysconfdir}/unbound/conf.d
 %config(noreplace) %attr(0660, root, unbound) %{_sysconfdir}/unbound/conf.d/01-pihole.conf
 %config(noreplace) %attr(0644, root, root) %{_sysconfdir}/dnsmasq.d/99-edns.conf
 

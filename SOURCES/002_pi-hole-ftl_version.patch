@@ -1,34 +1,34 @@
-diff -uNr FTL.orig/src/version.c.in FTL/src/version.c.in
---- FTL.orig/src/version.c.in	2025-02-06 20:16:39.000000000 +0100
-+++ FTL/src/version.c.in	2025-02-07 14:54:00.740932300 +0100
+diff -uNr FTL-6.7.orig/src/version.c.in FTL-6.7/src/version.c.in
+--- FTL-6.7.orig/src/version.c.in	2026-07-06 17:07:11.000000000 -0300
++++ FTL-6.7/src/version.c.in	2026-07-18 01:43:07.663723334 -0300
 @@ -12,33 +12,33 @@
  
  const char * __attribute__ ((const)) git_version(void)
  {
 -	return "@GIT_VERSION@";
-+	return "6.x+git.20260307T165144~52435a9";
++	return "v6.7";
  }
  
  const char * __attribute__ ((const)) git_date(void)
  {
 -	return "@GIT_DATE@";
-+	return "20260307";
++	return "20260706";
  }
  const char * __attribute__ ((const)) git_branch(void)
  {
 -	return "@GIT_BRANCH@";
-+	return "development";
++	return "master";
  }
  const char * __attribute__ ((const)) git_tag(void)
  {
 -	return "@GIT_TAG@";
-+	return "6.5";
++	return "v6.7";
  }
  
  const char * __attribute__ ((const)) git_hash(void)
  {
 -	return "@GIT_HASH@";
-+	return "52435a9";
++	return "fa65a88";
  }
  
  const char * __attribute__ ((const)) ftl_arch(void)
@@ -40,5 +40,5 @@ diff -uNr FTL.orig/src/version.c.in FTL/src/version.c.in
  const char * __attribute__ ((const)) ftl_cc(void)
  {
 -	return "@FTL_CC@";
-+	return "gcc 15.2.1+git10776 (SUSE Linux)";
++	return "gcc 15.3.0 (SUSE Linux)";
  }

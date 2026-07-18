@@ -18,7 +18,7 @@
 %define _lto_cflags %{nil}
 
 Name:           pi-hole-ftl
-Version:        6.6.2
+Version:        6.7
 Release:        1.1
 Summary:        Network-wide ad blocking via your own Linux hardware
 License:        EUPL-1.1
@@ -26,7 +26,7 @@ Group:          System/Management
 Url:            https://pi-hole.net/
 
 # https://github.com/pi-hole/FTL
-Source0:        %{name}-%{version}.tar.xz
+Source0:        %{name}-%{version}.tar.gz
 # https://raw.githubusercontent.com/pi-hole/pi-hole/development-v6/advanced/Templates/pihole-FTL.systemd
 Source1:        pihole-ftl.service
 Source2:        pihole-FTL.conf.in
@@ -39,9 +39,6 @@ Source9:        06-rfc6761.conf
 Patch1:         001_%{name}_fix_warnings_as_errors.patch
 Patch2:         002_%{name}_version.patch
 Patch3:         003_%{name}_fix_build_mbedtls_3.5.6.patch
-Patch4:         004_pi-hole-ftl_fix_build_with_nettle4.patch
-Patch5:			005_pi-hole-ftl_fix_build_with_nettle4_sha256.patch
-Patch6:			006_pi-hole-ftl_fix_build_with_nettle4_dnssec.patch
 
 BuildRequires:  cmake
 BuildRequires:  libnettle-devel >= 3.9
@@ -53,7 +50,7 @@ BuildRequires:  sqlite3-devel
 BuildRequires:  gmp-devel
 BuildRequires:  mbedtls-devel
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  xz
+BuildRequires:  gzip
 BuildRequires:  vim
 BuildRequires:  libunistring-devel
 
@@ -73,7 +70,7 @@ FTLDNS™ (pihole-FTL) provides an interactive API and also generates statistics
 * Insightful: stats normally reserved inside of dnsmasq are made available so you can see what's really happening on your network
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -n FTL-%{version}
 
 # Remove comments from pihole-FTL.conf to cause pihole bash script behave properly.
 sed '/^;/d' %{S:2} > pihole-FTL.conf
@@ -137,8 +134,8 @@ DNSStubListener=no
 EOF
 fi
 
-if command -v systemctl >/dev/null 2>&1; then
-  systemctl reload-or-restart systemd-resolved || true
+if systemctl -q list-unit-files systemd-resolved.service 2>/dev/null; then
+  systemctl reload-or-restart systemd-resolved.service || true
 fi
 
 if [ -x /usr/bin/pihole ]; then
@@ -169,7 +166,6 @@ fi
 %{_sbindir}/rc%{name}
 %endif
 %dir %{_datadir}/pi-hole
-%dir %{_sysconfdir}/dnsmasq.d
 %config(noreplace) %{_sysconfdir}/dnsmasq.d/06-rfc6761.conf
 %ghost %attr(0750,pihole,pihole) /run/pihole
 
